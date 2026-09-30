@@ -2,14 +2,15 @@
    Bass Culture (Amapiano Mix)
    Plain JavaScript, no libraries, no build step. Read it top to bottom:
 
-     1. Settings        <- normally the only part you need to change
-     2. Small helpers
-     3. The 3D CD case   (drag to rotate, plus the four view buttons)
-     4. The audio player (play/pause, seek bar, download)
-     5. Repeat
-     6. Volume and mute
-     7. Share popover
-     8. Keyboard shortcuts
+      1. Settings        <- normally the only part you need to change
+      2. Small helpers
+      3. The 3D CD case   (drag to rotate, plus the four view buttons)
+      4. The audio player (play/pause, seek bar, download)
+      5. Repeat
+      6. Volume and mute
+      7. Share popover
+      8. Keyboard shortcuts
+      9. Offline caching (starts the music once the Service Worker is ready)
    ========================================================================== */
 
 
@@ -186,7 +187,10 @@ const PAUSE_PATH = 'M200,32H160a16,16,0,0,0-16,16V208a16,16,0,0,0,16,16h40a16,16
 let isScrubbing = false;
 
 const streamUrl = resolveTrackUrl(CONFIG.track);
-audio.src = streamUrl;
+
+// audio.src is set in section 9 instead, but only once the Service Worker is
+// in charge. Setting it here would start a download that the Service Worker
+// never sees, and the visitor would end up downloading the song twice.
 downloadLink.href = streamUrl;
 downloadLink.setAttribute('download', '');
 
@@ -395,3 +399,78 @@ document.addEventListener('keydown', event => {
     toggleShareMenu(false);
   }
 });
+
+
+/* --------------------------------------------------------------------------
+   9. OFFLINE CACHING
+   sw.js does the real work. This section starts the Service Worker, waits
+   until it is in charge of the page, and only then points the player at the
+   song so that the Service Worker can catch that first request.
+
+   Why the wait matters: a Service Worker only handles requests made by a
+   page it already controls. Asking for the song too early means the browser
+   fetches it directly, the Service Worker never sees those bytes, and a
+   second download happens just to save a copy. That would double the file on
+   every first visit, which is the opposite of what we want.
+   -------------------------------------------------------------------------- */
+const cacheMessage = $('cacheMsg');
+
+function showCacheMessage(text) {
+  cacheMessage.textContent = text || '';
+}
+
+// Resolve once the page is controlled, or false if it takes too long. The
+// timeout matters: the music must never be held hostage by the cache.
+function waitForControl() {
+  if (navigator.serviceWorker.controller) return Promise.resolve(true);
+
+  return new Promise(resolve => {
+    const timer = setTimeout(() => resolve(false), 3000);
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      clearTimeout(timer);
+      resolve(true);
+    }, { once: true });
+  });
+}
+
+// The Service Worker posts back once the copy is genuinely written, so the
+// "saved" message never appears for a half-downloaded song.
+navigator.serviceWorker?.addEventListener('message', event => {
+  const note = event.data;
+  if (!note || note.type !== 'saved') return;
+
+  // Ignore notes about anything other than our own song.
+  if (!note.url.startsWith(new URL(streamUrl, location.href).href)) return;
+
+  showCacheMessage('Saved for offline — the download will be instant next time');
+});
+
+async function startMusic() {
+  // No Service Worker at all: an old browser, or an ordinary http:// address
+  // that is not localhost. Play normally and say nothing.
+  if (!('serviceWorker' in navigator)) {
+    audio.src = streamUrl;
+    return;
+  }
+
+  try {
+    await navigator.serviceWorker.register('./sw.js');
+  } catch {
+    // This almost always means index.html was opened as a file on disk,
+    // because Service Workers need https or localhost.
+    showCacheMessage('Offline caching needs a local server — see the README');
+    audio.src = streamUrl;
+    return;
+  }
+
+  const isControlled = await waitForControl();
+
+  if (isControlled) {
+    showCacheMessage('Loading song — saving for offline…');
+  }
+
+  audio.src = streamUrl;
+}
+
+startMusic();

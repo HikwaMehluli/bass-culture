@@ -441,6 +441,15 @@
 		min-height: 14px
 	}
 
+	/* The caching line sits just under the message line, so tuck it closer
+	   and make it a touch quieter than a real message. */
+	.cache-msg {
+		margin-top: 4px;
+		font-size: 11px;
+		min-height: 13px;
+		opacity: .85
+	}
+
 	.player {
 		flex-direction: column;
 		align-items: stretch;
