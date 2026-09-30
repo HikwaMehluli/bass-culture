@@ -93,6 +93,10 @@ function drawCase() {
     'rotateX(' + tiltX + 'deg) rotateY(' + tiltY + 'deg)';
 }
 
+// A browser starts its own image drag when you press on a picture, which
+// would fight with the rotation. Block it so the case always rotates.
+stageElement.addEventListener('dragstart', event => event.preventDefault());
+
 stageElement.addEventListener('pointerdown', event => {
   isDragging = true;
   lastPointerX = event.clientX;
@@ -174,8 +178,8 @@ const totalTime = $('dur');
 const downloadLink = $('dl');
 
 // The two shapes the play/pause button can show.
-const PLAY_PATH = 'M8 5v14l11-7z';
-const PAUSE_PATH = 'M6 5h4v14H6zM14 5h4v14h-4z';
+const PLAY_PATH = 'M232.4,114.49,88.32,26.35a16,16,0,0,0-16.2-.3A15.86,15.86,0,0,0,64,39.87V216.13A15.94,15.94,0,0,0,80,232a16.07,16.07,0,0,0,8.36-2.35L232.4,141.51a15.81,15.81,0,0,0,0-27ZM80,215.94V40l143.83,88Z';
+const PAUSE_PATH = 'M200,32H160a16,16,0,0,0-16,16V208a16,16,0,0,0,16,16h40a16,16,0,0,0,16-16V48A16,16,0,0,0,200,32Zm0,176H160V48h40ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Zm0,176H56V48H96Z';
 
 // True while the user is dragging the seek bar, so we show the position
 // they dragged to instead of the position the song is really at.
@@ -285,8 +289,8 @@ const volumeSlider = $('vol');
 const muteButton = $('mute');
 
 // The two shapes the speaker can show: with sound waves, and with a cross.
-const SOUND_PATH = 'M3 9v6h4l5 4V5L7 9zM16 8a5 5 0 0 1 0 8l-1-1.4a3.2 3.2 0 0 0 0-5.2z';
-const MUTED_PATH = 'M3 9v6h4l5 4V5L7 9zm16 .4L20.4 8 19 6.6 17.6 8 16.2 6.6 14.8 8l1.4 1.4-1.4 1.4 1.4 1.4L17.6 11l1.4 1.4L20.4 11z';
+const SOUND_PATH = 'M155.51,24.81a8,8,0,0,0-8.42.88L77.25,80H32A16,16,0,0,0,16,96v64a16,16,0,0,0,16,16H77.25l69.84,54.31A8,8,0,0,0,160,224V32A8,8,0,0,0,155.51,24.81ZM32,96H72v64H32ZM144,207.64,88,164.09V91.91l56-43.55Zm54-106.08a40,40,0,0,1,0,52.88,8,8,0,0,1-12-10.58,24,24,0,0,0,0-31.72,8,8,0,0,1,12-10.58ZM248,128a79.9,79.9,0,0,1-20.37,53.34,8,8,0,0,1-11.92-10.67,64,64,0,0,0,0-85.33,8,8,0,1,1,11.92-10.67A79.83,79.83,0,0,1,248,128Z';
+const MUTED_PATH = 'M53.92,34.62A8,8,0,1,0,42.08,45.38L73.55,80H32A16,16,0,0,0,16,96v64a16,16,0,0,0,16,16H77.25l69.84,54.31A8,8,0,0,0,160,224V175.09l42.08,46.29a8,8,0,1,0,11.84-10.76ZM32,96H72v64H32ZM144,207.64,88,164.09V95.89l56,61.6Zm42-63.77a24,24,0,0,0,0-31.72,8,8,0,1,1,12-10.57,40,40,0,0,1,0,52.88,8,8,0,0,1-12-10.59Zm-80.16-76a8,8,0,0,1,1.4-11.23l39.85-31A8,8,0,0,1,160,32v74.83a8,8,0,0,1-16,0V48.36l-26.94,21A8,8,0,0,1,105.84,67.91ZM248,128a79.9,79.9,0,0,1-20.37,53.34,8,8,0,0,1-11.92-10.67,64,64,0,0,0,0-85.33,8,8,0,1,1,11.92-10.67A79.83,79.83,0,0,1,248,128Z';
 
 let isMuted = false;
 let volume = CONFIG.volume;   // remembered, so unmuting restores it

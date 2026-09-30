@@ -67,3 +67,5 @@ Suno playlists can't be loaded directly. Use the link to a single song from the 
 ## Credits
 
 Cover art, mix and page by Mehluli Hikwa / thatAfro. Artwork and music are not licensed for reuse unless stated otherwise.
+
+Interface icons are from [Phosphor Icons](https://phosphoricons.com) (regular weight, MIT licence), inlined as SVG.

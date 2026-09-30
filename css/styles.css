@@ -102,7 +102,12 @@
 		width: calc(100% - 27px);
 		height: calc(100% - 22px);
 		object-fit: cover;
-		box-shadow: 0 0 0 1px rgba(0, 0, 0, .6)
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, .6);
+		/* The case is rotated by dragging, so the cover must not become a
+		   draggable image. Let the drag pass through to the stage instead. */
+		pointer-events: none;
+		-webkit-user-drag: none;
+		user-select: none
 	}
 
 	/* hinge edge, clear plastic, gloss */
@@ -350,9 +355,11 @@
 		border-color: var(--ink)
 	}
 
+	/* Phosphor icons are 256x256 and use fill: currentColor, so they pick up
+	   the button colour, including the accent blue when pressed. */
 	.player svg {
-		width: 16px;
-		height: 16px;
+		width: 18px;
+		height: 18px;
 		fill: currentColor
 	}
 
@@ -417,8 +424,8 @@
 	}
 
 	.pop svg {
-		width: 17px;
-		height: 17px
+		width: 18px;
+		height: 18px
 	}
 
 	.player a:focus-visible,
