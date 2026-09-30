@@ -71,7 +71,7 @@ python -m http.server 8000
 
 Then open <http://localhost:8000>.
 
-To check that caching really happened, open **DevTools > Application > Cache Storage**. You should see a cache named `bass-culture-v2` holding the page files and `songs/bass-culture-amapiano-mix.mp3`. You can also tick **Offline** in the **Network** tab and reload: the case, the player and the song should all still work.
+To check that caching really happened, open **DevTools > Application > Cache Storage**. You should see a cache named `bass-culture-v3` holding the page files and `songs/bass-culture-amapiano-mix.mp3`. You can also tick **Offline** in the **Network** tab and reload: the case, the player and the song should all still work.
 
 ## Host on GitHub Pages
 
@@ -115,7 +115,7 @@ The player receives an opaque stream and never sees the individual bytes, so a p
 The cache is cache-first, which means a visitor who has already visited keeps seeing whatever they loaded first. To fix that, edit the version at the top of `sw.js`:
 
 ```js
-const CACHE = 'bass-culture-v2';   // change to v3, then v4, and so on
+const CACHE = 'bass-culture-v3';   // change to v4, then v5, and so on
 ```
 
 The Service Worker notices the change, saves the new files and deletes the old cache on the next visit. **Bump this whenever you publish changes**, or your updates will not reach returning visitors. Only `sw.js` is versioned this way; the song is keyed by its own address, so replacing the MP3 at the same path needs the version bump too.
@@ -124,12 +124,81 @@ The Service Worker notices the change, saves the new files and deletes the old c
 
 Any current browser: Chrome, Edge, Firefox and Safari. Private/incognito windows and a few strict privacy settings may block saving, in which case the player still works, it just re-downloads each visit. If you see `Offline caching needs a local server`, `sw.js` could not register — check that you are on `https` or `localhost` and not a `file://` path.
 
+## Analytics
+
+The page reports how many people listened and how many took the file. Numbers go to [Umami](https://umami.is), a privacy-first analytics service, and sit in an account behind a login. There is no cookie banner because nothing personal is collected: no cookies, no IP addresses, no fingerprinting, nothing that identifies a visitor.
+
+Remove the `<script>` tag in `index.html` and the two calls in `js/script.js` if you don't want any of it. The player behaves identically either way, because every call is optional.
+
+### Where the numbers actually are
+
+This is the part that makes the dashboard look broken when it isn't.
+
+| You are looking for | Where it is |
+| --- | --- |
+| Page views, visitors, sessions | **Overview** page |
+| `Play` and `Download` | **Events** page |
+
+Plays and downloads are custom events, so they never appear in the headline tiles on the Overview page. Go to **Events** to see them.
+
+### Getting your own counts
+
+1. Sign up at [umami.is](https://umami.is) and add a website.
+2. Click **Edit** on that website, then the **Tracking Code** tab, and copy the script tag.
+3. Paste it into `<head>` in `index.html`, replacing the existing one.
+
+Do this on your own copy. The website ID in this repo belongs to the original author, and the `data-domains` setting below means a copy on a different address sends that account nothing anyway.
+
+### Why a fork counts nothing, on purpose
+
+```html
+<script defer src="https://cloud.umami.is/script.js"
+  data-website-id="4aab31a8-07c2-4cfb-a02a-5c2c3ac10185"
+  data-domains="hikwamehluli.github.io,localhost,127.0.0.1"></script>
+```
+
+`data-domains` is a comma-separated list of hostnames. The tracker compares it against `window.location.hostname` and refuses to send anything at all unless the current address matches. That is what stops everyone else's copy of this repo from inflating one dashboard.
+
+Two things follow, and both have caught people out:
+
+- **It matches a hostname, not a path.** `localhost` is listed so the page still counts while you test it on your own machine. Anything else — a LAN address like `192.168.1.5` when testing on your phone over Wi-Fi — stays silent. Test on mobile data against the real address instead.
+- **If you rename the GitHub user or the repo, update the first entry to match,** or the page goes quiet with no error anywhere.
+
+The website ID is a public send key. Anyone can read it out of the page source, but it only ever lets somebody *add* to your counts; reading the numbers still needs the account login.
+
+### Nothing is being recorded
+
+If the tracker were broken, it would be silent in the browser with no warning. Check these four things, in order:
+
+1. **Are the requests going out?** DevTools > **Network**, filter `send`, and reload. Expect `POST https://gateway.umami.is/api/send` returning **200**: one for the page view, another for performance a moment later, and one more per `Play` or `Download`. The `OPTIONS` line above each one is a preflight the browser requires because the tracker sends custom headers. It is normal.
+2. **Did the tracker script itself load?** Search the Network tab for `cloud.umami.is/script.js`. Blocked or missing means an ad blocker, Brave, or a privacy extension stopped it. Try a private window with extensions disabled before changing any code.
+3. **What address are you on?** Run this in the console:
+
+   ```js
+   location.hostname
+   ```
+
+   If it isn't in the `data-domains` list, the tracker is deliberately refusing to send.
+4. **Did the Service Worker serve you the old page?** A returning visitor is served the cached copy, so a fix may not have reached you yet. Bump the version in `sw.js`, then hard refresh **twice** — the first load still comes from the previous cache. Or unregister it: DevTools > **Application > Service Workers** > **Unregister**.
+
+A browser asking not to be tracked is *not* a reason to stop counting now, but note that ad blockers and privacy extensions will always be able to hide a visit.
+
+### What counts as a play or a download
+
+Both are deliberately hard to fake, which also means they stay near zero at first:
+
+- **`Play`** needs **10 seconds of real listening**, or half the track for anything shorter than twenty seconds. Dragging the seek bar is detected and ignored, and only one play is counted per visit no matter how often the track is replayed.
+- **`Download`** only counts a genuine left-click on the download icon. Right-click and "Save link as" bypass it, and so does a long-press on a phone.
+
+If both sit at zero while page views climb, that is most likely people pressing play and leaving, not a fault.
+
 ## Troubleshooting
 
 - **"Could not play this track" or "Track could not be loaded — check the MP3 file":** the `CONFIG.track` value is wrong, the file name doesn't match exactly (names are case-sensitive), or the MP3 didn't upload properly. Open the MP3 in the repo on GitHub. If it says a few bytes instead of megabytes, delete it and upload it again.
 - **Large files:** GitHub's web upload accepts files up to 25 MB. For bigger files, use GitHub Desktop or git (up to 100 MB), or link the song from Suno or Dropbox.
 - **Changes not showing:** GitHub Pages can take a minute to update. Hard refresh the page.
 - **Changes still not showing after that:** a returning visitor is being served the saved copy. Bump the version in `sw.js`, or tick **Offline** in DevTools, go to **Application > Service Workers** and click **Unregister**, then reload.
+- **No numbers in the dashboard:** see [Analytics](#nothing-is-being-recorded) above. The likeliest cause is that you're looking on the Overview page, where plays and downloads never appear.
 
 ## Credits
 
