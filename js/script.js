@@ -9,8 +9,9 @@
       5. Repeat
       6. Volume and mute
       7. Share popover
-      8. Keyboard shortcuts
-      9. Offline caching (starts the music once the Service Worker is ready)
+       8. Keyboard shortcuts
+       9. Offline caching (starts the music once the Service Worker is ready)
+       10. Plays and downloads (private counts, sent to Umami Cloud)
    ========================================================================== */
 
 
@@ -474,3 +475,58 @@ async function startMusic() {
 }
 
 startMusic();
+
+
+/* --------------------------------------------------------------------------
+   10. PLAYS AND DOWNLOADS
+   Two private numbers: how many people actually listened, and how many took
+   the file. Both are sent to Umami Cloud, whose dashboard sits behind a
+   login, so the totals stay yours.
+
+   The tracker itself is loaded from index.html, and it only runs on
+   hikwamehluli.github.io (see data-domains there). A fork or remix on
+   someone else's site therefore sends nothing to your dashboard.
+
+   If the script is blocked by an ad blocker, or the page is offline,
+   window.umami is simply missing. Every call is optional, so the player
+   behaves the same either way and nothing here can break playback.
+   -------------------------------------------------------------------------- */
+
+// Seconds of real listening so far, plus where the song was a moment ago.
+let listened = 0;
+let lastPosition = 0;
+let countedPlay = false;
+
+// One play is worth 30 seconds of attention, or half the track when the
+// song is shorter than a minute.
+const playThreshold = () => {
+  const length = Number.isFinite(audio.duration) ? audio.duration : 0;
+  return length > 0 ? Math.min(30, length * 0.5) : 30;
+};
+
+// 'timeupdate' fires roughly four times a second while the song runs.
+audio.addEventListener('timeupdate', () => {
+  const position = audio.currentTime;
+  const step = position - lastPosition;
+  lastPosition = position;
+
+  // A jump of two seconds or more is someone dragging the seek bar, not
+  // playback, and a backwards step is dragging it to the left. Neither is
+  // listening, and counting them would let one visitor fake a full play by
+  // dropping the bar on the final second.
+  if (step > 0 && step < 2) listened += step;
+
+  if (countedPlay || listened < playThreshold()) return;
+
+  countedPlay = true;   // one play per visit, however often they replay it
+  window.umami?.track('Play');
+});
+
+// Re-anchor on a seek, so the jump itself is never added to listened.
+audio.addEventListener('seeking', () => {
+  lastPosition = audio.currentTime;
+});
+
+// No preventDefault here: the click must still go through and download the
+// file. Right-click and "Save link as" bypass this, and so go uncounted.
+downloadLink.addEventListener('click', () => window.umami?.track('Download'));

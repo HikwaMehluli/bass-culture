@@ -71,7 +71,7 @@ python -m http.server 8000
 
 Then open <http://localhost:8000>.
 
-To check that caching really happened, open **DevTools > Application > Cache Storage**. You should see a cache named `bass-culture-v1` holding the page files and `songs/bass-culture-amapiano-mix.mp3`. You can also tick **Offline** in the **Network** tab and reload: the case, the player and the song should all still work.
+To check that caching really happened, open **DevTools > Application > Cache Storage**. You should see a cache named `bass-culture-v2` holding the page files and `songs/bass-culture-amapiano-mix.mp3`. You can also tick **Offline** in the **Network** tab and reload: the case, the player and the song should all still work.
 
 ## Host on GitHub Pages
 
@@ -115,7 +115,7 @@ The player receives an opaque stream and never sees the individual bytes, so a p
 The cache is cache-first, which means a visitor who has already visited keeps seeing whatever they loaded first. To fix that, edit the version at the top of `sw.js`:
 
 ```js
-const CACHE = 'bass-culture-v1';   // change to v2, then v3, and so on
+const CACHE = 'bass-culture-v2';   // change to v3, then v4, and so on
 ```
 
 The Service Worker notices the change, saves the new files and deletes the old cache on the next visit. **Bump this whenever you publish changes**, or your updates will not reach returning visitors. Only `sw.js` is versioned this way; the song is keyed by its own address, so replacing the MP3 at the same path needs the version bump too.

@@ -18,7 +18,7 @@
 
 /* The version number here, plus the files we always want available offline.
    './' paths are relative on purpose, so the site works in any subfolder. */
-const CACHE = 'bass-culture-v1';
+const CACHE = 'bass-culture-v2';
 
 const PRECACHE = [
   './',
