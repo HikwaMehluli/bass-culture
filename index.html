@@ -9,16 +9,27 @@
 	<link rel="stylesheet" href="./css/styles.css">
 
 	<!-- Analytics. The numbers live in a Umami Cloud account behind a login, so
-	     nobody else can read them. The website ID below is a write-only key:
-	     seeing it gives someone no way to view your stats.
-	     data-domains is the line that protects the count. The tracker refuses
-	     to run on any address not listed, so a fork or remix deployed on
+	     nobody else can read them. The website ID is a public send key: anyone
+	     can read it out of this page source, but it only ever lets somebody
+	     ADD to your counts. Reading the numbers still needs your login.
+
+	     data-domains is the line that protects the count. The tracker matches
+	     this list against window.location.hostname and stays completely
+	     silent on any address not in it, so a fork or remix deployed on
 	     someone else's GitHub Pages site sends you nothing at all.
-	     data-do-not-track respects listeners who ask not to be tracked. -->
+
+	     Two things to know, because both look like "analytics is broken":
+	       - It matches a HOSTNAME, not a path. 'localhost' is listed so the
+	         site still counts while you test it on your own machine.
+	       - If you ever rename the GitHub user or the repo, change the first
+	         entry below to match, or nothing will be counted at all.
+
+	     Plays and downloads are sent from js/script.js as custom events, so
+	     they appear under Events in the dashboard, never in the headline
+	     views on the Overview page. -->
 	<script defer src="https://cloud.umami.is/script.js"
 		data-website-id="4aab31a8-07c2-4cfb-a02a-5c2c3ac10185"
-		data-domains="hikwamehluli.github.io"
-		data-do-not-track="true"></script>
+		data-domains="hikwamehluli.github.io,localhost,127.0.0.1"></script>
 
 	<!-- Interface icons are from Phosphor Icons (MIT licence), regular weight.
 	     Reused here as inline SVG so the page needs no external requests. -->

@@ -484,8 +484,8 @@ startMusic();
    login, so the totals stay yours.
 
    The tracker itself is loaded from index.html, and it only runs on
-   hikwamehluli.github.io (see data-domains there). A fork or remix on
-   someone else's site therefore sends nothing to your dashboard.
+   hikwamehluli.github.io and localhost (see data-domains there). A fork or
+   remix on someone else's site therefore sends nothing to your dashboard.
 
    If the script is blocked by an ad blocker, or the page is offline,
    window.umami is simply missing. Every call is optional, so the player
@@ -497,11 +497,11 @@ let listened = 0;
 let lastPosition = 0;
 let countedPlay = false;
 
-// One play is worth 30 seconds of attention, or half the track when the
-// song is shorter than a minute.
+// One play is worth 10 seconds of attention, or half the track when the
+// song is shorter than twenty seconds.
 const playThreshold = () => {
   const length = Number.isFinite(audio.duration) ? audio.duration : 0;
-  return length > 0 ? Math.min(30, length * 0.5) : 30;
+  return length > 0 ? Math.min(10, length * 0.5) : 10;
 };
 
 // 'timeupdate' fires roughly four times a second while the song runs.
