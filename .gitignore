@@ -1,0 +1,78 @@
+# ---------------------------------------------------------------------------
+# Local notes and scratch files
+# ---------------------------------------------------------------------------
+ai/
+*.local
+*.log
+
+# ---------------------------------------------------------------------------
+# Secrets — never commit these
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.json
+credentials.json
+
+# ---------------------------------------------------------------------------
+# Dependencies (this site has none, but keep the folder out if you add tooling)
+# ---------------------------------------------------------------------------
+node_modules/
+jspm_packages/
+.pnp
+.pnp.js
+vendor/
+bower_components/
+
+# ---------------------------------------------------------------------------
+# Build and cache output
+# ---------------------------------------------------------------------------
+dist/
+build/
+out/
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.svelte-kit/
+.astro/
+*.tsbuildinfo
+
+# ---------------------------------------------------------------------------
+# Test and coverage output
+# ---------------------------------------------------------------------------
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# ---------------------------------------------------------------------------
+# Editor and OS clutter
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.code-workspace
+Thumbs.db
+Desktop.ini
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+$RECYCLE.BIN/
+
+# ---------------------------------------------------------------------------
+# Platform metadata
+# ---------------------------------------------------------------------------
+.vercel
+.netlify
+.wrangler
+
+# NOTE: songs/ and img/ are deliberately NOT ignored.
+# GitHub Pages can only serve files that are committed to the repository,
+# so the MP3 and the cover art must stay tracked.

@@ -1,0 +1,519 @@
+
+:root {
+	--bg: #1a1613;
+	--bg2: #0d0b0a;
+	--ink: #f1e7d6;
+	--mute: #a89a86;
+	--btn: #2a231e;
+	--accent: #4a9eda;
+	box-sizing: border-box;
+		padding-top: env(safe-area-inset-top, 0px);
+		padding-bottom: env(safe-area-inset-bottom, 0px)
+	}
+
+	@media (prefers-color-scheme:light) {
+		:root:not([data-theme="dark"]) {
+			--bg: #d9cdb8;
+			--bg2: #b9a98f;
+			--ink: #241c15;
+			--mute: #5b4d3d;
+			--btn: #e9dfcc
+		}
+	}
+
+	:root[data-theme="dark"] {
+		--bg: #1a1613;
+		--bg2: #0d0b0a;
+		--ink: #f1e7d6;
+		--mute: #a89a86;
+		--btn: #2a231e
+	}
+
+	html,
+	body {
+		min-height: 100%;
+		margin: 0
+	}
+
+	body {
+		background: radial-gradient(ellipse at 50% 40%, var(--bg), var(--bg2));
+		color: var(--ink);
+		font-family: "Helvetica Neue", Arial, sans-serif;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		overflow-y: auto;
+		user-select: none;
+		-webkit-user-select: none
+	}
+
+	.stage {
+		--s: 1;
+		perspective: 1600px;
+		width: min(92vw, 360px);
+		height: min(92vw, 360px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		touch-action: none;
+		cursor: grab
+	}
+
+	.stage:active {
+		cursor: grabbing
+	}
+
+	.case {
+		position: relative;
+		width: 300px;
+		height: 300px;
+		transform-style: preserve-3d;
+		transform: scale(var(--s)) rotateX(-8deg) rotateY(-28deg);
+		transition: transform .9s cubic-bezier(.2, .8, .2, 1)
+	}
+
+	.case.drag {
+		transition: none
+	}
+
+	.f {
+		position: absolute;
+		backface-visibility: hidden;
+		overflow: hidden
+	}
+
+	.front,
+	.back {
+		width: 300px;
+		height: 300px;
+		left: 0;
+		top: 0
+	}
+
+	.front {
+		transform: translateZ(11px);
+		background: #111
+	}
+
+	.front img {
+		position: absolute;
+		inset: 11px 8px 11px 19px;
+		width: calc(100% - 27px);
+		height: calc(100% - 22px);
+		object-fit: cover;
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, .6)
+	}
+
+	/* hinge edge, clear plastic, gloss */
+	.front:before {
+		content: "";
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		width: 11px;
+		background: linear-gradient(90deg, #0a0a0a, #3a3a3a 40%, #111);
+		z-index: 2
+	}
+
+	.front:after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: 3;
+		pointer-events: none;
+		background: linear-gradient(115deg, rgba(255, 255, 255, .34) 0%, rgba(255, 255, 255, .06) 30%, transparent 42%, rgba(255, 255, 255, .12) 62%, transparent 75%);
+		border: 2px solid rgba(255, 255, 255, .22);
+		box-shadow: inset 0 0 14px rgba(255, 255, 255, .18)
+	}
+
+	.back {
+		transform: rotateY(180deg) translateZ(11px);
+		background: #0c0c0c;
+		padding: 0
+	}
+
+	.back .inlay {
+		position: absolute;
+		inset: 11px 19px 11px 8px;
+		background: #15100c;
+		color: #f1e7d6;
+		padding: 16px 16px 12px;
+		display: flex;
+		flex-direction: column
+	}
+
+	.back .inlay:before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: url("../img/bass-culture-amapiano-mix-cover-art.jpg") center/cover;
+		opacity: .16;
+		filter: blur(2px)
+	}
+
+	.back h2 {
+		position: relative;
+		margin: 0;
+		font-size: 30px;
+		line-height: .95;
+		font-weight: 900;
+		letter-spacing: -.5px
+	}
+
+	.back h3 {
+		position: relative;
+		margin: 4px 0 0;
+		font-size: 13px;
+		font-weight: 700
+	}
+
+	.back p {
+		position: relative;
+		margin: auto 0 8px;
+		font-size: 9px;
+		line-height: 1.4;
+		color: #cbbba3;
+		max-width: 150px
+	}
+
+	.back .credit {
+		display: block;
+		margin-top: 2px;
+		font-size: 7px;
+		color: #a89a86
+	}
+
+	.back .row {
+		position: relative;
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between
+	}
+
+	.back .brand {
+		font-size: 15px;
+		font-weight: 800
+	}
+
+	.bar {
+		width: 74px;
+		height: 34px;
+		background: #fff;
+		padding: 3px;
+		box-sizing: border-box
+	}
+
+	.bar i {
+		display: block;
+		height: 100%;
+		background: repeating-linear-gradient(90deg, #000 0 1px, #fff 1px 3px, #000 3px 5px, #fff 5px 6px, #000 6px 7px, #fff 7px 10px)
+	}
+
+	.back:after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background: linear-gradient(245deg, rgba(255, 255, 255, .26), transparent 35%);
+		border: 2px solid rgba(255, 255, 255, .18)
+	}
+
+	.spine {
+		width: 22px;
+		height: 300px;
+		left: 139px;
+		top: 0;
+		transform: rotateY(-90deg) translateZ(150px);
+		background: linear-gradient(90deg, #141210, #231d18 50%, #0e0c0b);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-left: 2px solid rgba(255, 255, 255, .2)
+	}
+
+	.spine span {
+		transform: rotate(90deg);
+		white-space: nowrap;
+		color: #f1e7d6;
+		font-weight: 900;
+		font-size: 12px;
+		letter-spacing: 1px
+	}
+
+	.spine b {
+		font-weight: 500;
+		font-size: 9px;
+		margin-left: 8px;
+		color: var(--accent)
+	}
+
+	.edge {
+		width: 22px;
+		height: 300px;
+		left: 139px;
+		top: 0;
+		transform: rotateY(90deg) translateZ(150px);
+		background: linear-gradient(90deg, rgba(255, 255, 255, .35), rgba(30, 30, 30, .9))
+	}
+
+	.top,
+	.bot {
+		width: 300px;
+		height: 22px;
+		left: 0;
+		top: 139px;
+		background: linear-gradient(rgba(255, 255, 255, .3), rgba(30, 30, 30, .85))
+	}
+
+	.top {
+		transform: rotateX(90deg) translateZ(150px)
+	}
+
+	.bot {
+		transform: rotateX(-90deg) translateZ(150px)
+	}
+
+	.shadow {
+		position: absolute;
+		left: 50%;
+		bottom: 2px;
+		width: 300px;
+		height: 40px;
+		transform: translateX(-50%);
+		background: radial-gradient(ellipse, rgba(0, 0, 0, .55), transparent 70%);
+		pointer-events: none
+	}
+
+	.stagewrap {
+		position: relative;
+		margin-top: 16px
+	}
+
+	nav {
+		display: flex;
+		gap: 8px;
+		margin-top: 22px;
+		flex-wrap: wrap;
+		justify-content: center
+	}
+
+	button {
+		background: var(--btn);
+		color: var(--ink);
+		border: 1px solid rgba(128, 110, 90, .4);
+		border-radius: 999px;
+		padding: 9px 18px;
+		font: 600 13px inherit;
+		font-family: inherit;
+		cursor: pointer
+	}
+
+	button:hover {
+		border-color: var(--ink)
+	}
+
+	button:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px
+	}
+
+	.player {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin-top: 6px;
+		padding: 8px 14px;
+		border-radius: 999px;
+		background: var(--btn);
+		border: 1px solid rgba(128, 110, 90, .4)
+	}
+
+	.player button,
+	.player a {
+		width: 36px;
+		height: 36px;
+		padding: 0;
+		border-radius: 50%;
+		display: grid;
+		place-items: center;
+		background: transparent;
+		color: var(--ink);
+		border: 1px solid rgba(128, 110, 90, .4);
+		cursor: pointer;
+		text-decoration: none
+	}
+
+	.player button:hover,
+	.player a:hover {
+		border-color: var(--ink)
+	}
+
+	.player svg {
+		width: 16px;
+		height: 16px;
+		fill: currentColor
+	}
+
+	.vol {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		color: var(--mute)
+	}
+
+	/* The mute button must not double as a label for the slider,
+	   or clicking it would also drag the slider. */
+	.vol #mute {
+		flex: 0 0 auto
+	}
+
+	.vol input {
+		width: 72px;
+		accent-color: var(--accent)
+	}
+
+	/* Mute and Repeat are "off" by default: dimmed and borderless.
+	   When aria-pressed is "true" they light up in the accent colour. */
+	#mute,
+	#repeat {
+		color: var(--mute);
+		border-color: transparent
+	}
+
+	#mute[aria-pressed="true"],
+	#repeat[aria-pressed="true"] {
+		color: var(--accent);
+		border-color: var(--accent)
+	}
+
+	.pop a:hover,
+	.pop button:hover {
+		border-color: var(--accent)
+	}
+
+	/* ---------- Share popover ---------- */
+	.share {
+		position: relative
+	}
+
+	.pop {
+		position: absolute;
+		right: 0;
+		bottom: calc(100% + 10px);
+		display: flex;
+		gap: 4px;
+		padding: 6px;
+		border-radius: 999px;
+		background: var(--btn);
+		border: 1px solid rgba(128, 110, 90, .4);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, .35)
+	}
+
+	/* [hidden] alone loses to display:flex above, so restate it */
+	.pop[hidden] {
+		display: none
+	}
+
+	.pop svg {
+		width: 17px;
+		height: 17px
+	}
+
+	.player a:focus-visible,
+	.vol input:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px
+	}
+
+	.msg {
+		margin-top: 8px;
+		font-size: 12px;
+		color: var(--mute);
+		min-height: 14px
+	}
+
+	.player {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 8px;
+		border-radius: 26px;
+		width: min(92vw, 360px);
+		box-sizing: border-box
+	}
+
+	.ctrls {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 10px
+	}
+
+	.seek {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		font-size: 12px;
+		color: var(--mute);
+		font-variant-numeric: tabular-nums
+	}
+
+	.seek span {
+		min-width: 34px
+	}
+
+	.seek span:last-child {
+		text-align: right
+	}
+
+	#seek {
+		flex: 1;
+		-webkit-appearance: none;
+		appearance: none;
+		height: 4px;
+		border-radius: 2px;
+		margin: 0;
+		cursor: pointer;
+		background: linear-gradient(90deg, var(--accent) var(--p, 0%), rgba(128, 110, 90, .4) var(--p, 0%))
+	}
+
+	#seek::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		width: 14px;
+		height: 14px;
+		border-radius: 50%;
+		background: #f1e7d6;
+		border: 2px solid var(--accent)
+	}
+
+	#seek::-moz-range-thumb {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: #f1e7d6;
+		border: 2px solid var(--accent)
+	}
+
+	#seek:disabled {
+		opacity: .45;
+		cursor: default
+	}
+
+	#seek:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 4px
+	}
+
+	small {
+		margin-top: 12px;
+		color: var(--mute);
+		font-size: 12px
+	}
+
+	@media (prefers-reduced-motion:reduce) {
+		.case {
+			transition: none
+		}
+	}
